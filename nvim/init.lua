@@ -1,4 +1,3 @@
--- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
@@ -15,41 +14,252 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Make sure to setup `mapleader` and `maplocalleader` before
--- loading lazy.nvim so that mappings are correct.
--- This is also a good place to setup other settings (vim.opt)
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
 
 vim.o.number = true
 vim.o.relativenumber = true
 
+vim.o.showmode = false
+
+vim.schedule(function()
+	vim.o.clipboard = 'unnamedplus'
+end)
+
+vim.o.breakindent = true
+
+vim.o.undofile = true
+
+vim.o.ignorecase = true
+vim.o.smartcase = true
+
+vim.o.signcolumn = 'yes'
+
+vim.o.updatetime = 250
+
+vim.o.timeoutlen = 300
+
+vim.o.splitright = true
+vim.o.splitbelow = true
+
+vim.o.list = true
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+
+vim.o.inccommand = 'split'
+
 vim.o.cursorline = true
-vim.o.cursorlineopt = 'number'
-vim.o.colorcolumn = '80'
+
+vim.o.scrolloff = 10
 
 vim.o.expandtab = false
 vim.o.tabstop = 4
 vim.o.shiftwidth = 4
 
--- Setup lazy.nvim
+vim.o.cursorlineopt = 'number'
+vim.o.colorcolumn = '80'
+
 require("lazy").setup({
 	spec = {
-		-- add your plugins here
 
 		{
 			"folke/tokyonight.nvim",
 			lazy = false,
 			priority = 1000,
 			opts = {},
-		}
+		},
+
+		{
+			"nvim-treesitter/nvim-treesitter",
+			branch = 'master',
+			lazy = false,
+			build = ":TSUpdate",
+			config = function()
+				require'nvim-treesitter.configs'.setup {
+					ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline" },
+
+					sync_install = false,
+
+					auto_install = true,
+
+					highlight = {
+						enable = true,
+						additional_vim_regex_highlighting = false,
+					},
+				}
+			end
+		},
+
+		{
+			'nvim-telescope/telescope.nvim', tag = '0.1.5',
+			requires = { 'nvim-lua/plenary.nvim' }
+		},
+
+		{
+			"lewis6991/gitsigns.nvim"
+		},
+
+		{
+			'nvim-lualine/lualine.nvim',
+			dependencies = { 'nvim-tree/nvim-web-devicons' },
+			config = function()
+				require('lualine').setup {
+					options = {
+						icons_enabled = true,
+						theme = 'auto',
+						component_separators = { left = '', right = ''},
+						section_separators = { left = '', right = ''},
+						disabled_filetypes = {
+							statusline = {},
+							winbar = {},
+						},
+						ignore_focus = {},
+						always_divide_middle = true,
+						always_show_tabline = true,
+						globalstatus = false,
+						refresh = {
+							statusline = 1000,
+							tabline = 1000,
+							winbar = 1000,
+							refresh_time = 16,
+							events = {
+								'WinEnter',
+								'BufEnter',
+								'BufWritePost',
+								'SessionLoadPost',
+								'FileChangedShellPost',
+								'VimResized',
+								'Filetype',
+								'CursorMoved',
+								'CursorMovedI',
+								'ModeChanged',
+							},
+						}
+					},
+					sections = {
+						lualine_a = {'mode'},
+						lualine_b = {'branch', 'diff', 'diagnostics'},
+						lualine_c = {'filename'},
+						lualine_x = {'filetype', 'fileformat'},
+						lualine_y = {'progress'},
+						lualine_z = {'location'}
+					},
+					inactive_sections = {
+						lualine_a = {},
+						lualine_b = {},
+						lualine_c = {'filename'},
+						lualine_x = {'location'},
+						lualine_y = {},
+						lualine_z = {}
+					},
+					tabline = {},
+					winbar = {},
+					inactive_winbar = {},
+					extensions = {}
+				}
+			end
+		},
+
+		{
+			"folke/todo-comments.nvim",
+			dependencies = { "nvim-lua/plenary.nvim" },
+			opts = {}
+		},
+
+		{
+			"folke/noice.nvim",
+			event = "VeryLazy",
+			opts = {},
+			dependencies = {
+				"MunifTanjim/nui.nvim",
+			}
+		},
+
+		{ 'ThePrimeagen/harpoon' },
+
+		-- LSP Zone
+		{'mason-org/mason.nvim', tag = 'v1.11.0', pin = true},
+		{'mason-org/mason-lspconfig.nvim', tag = 'v1.32.0', pin = true},
+		{'neovim/nvim-lspconfig', tag = 'v1.8.0', pin = true},
+		{'hrsh7th/cmp-nvim-lsp'},
+		{'hrsh7th/nvim-cmp'},
 
 	},
-	-- Configure any other settings here. See the documentation for more details.
-	-- colorscheme that will be used when installing plugins.
 	install = { colorscheme = { "habamax" } },
-	-- automatically check for plugin updates
 	checker = { enabled = true },
 })
 
 vim.cmd[[colorscheme tokyonight-night]]
+
+vim.keymap.set('n', '<leader>x', '<cmd>Explore<CR>')
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+vim.keymap.set('n', '<leader>d', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+
+local builtin = require('telescope.builtin')
+vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Telescope find files' })
+vim.keymap.set('n', '<leader>lg', builtin.live_grep, { desc = 'Telescope live grep' })
+
+vim.keymap.set('n', '<leader>a', function() require("harpoon.mark").add_file() end)
+vim.keymap.set('n', '<leader>h', function() require("harpoon.ui").toggle_quick_menu() end)
+vim.keymap.set('n', '<leader>1', function() require("harpoon.ui").nav_file(1) end)
+vim.keymap.set('n', '<leader>2', function() require("harpoon.ui").nav_file(2) end)
+vim.keymap.set('n', '<leader>3', function() require("harpoon.ui").nav_file(3) end)
+vim.keymap.set('n', '<leader>4', function() require("harpoon.ui").nav_file(4) end)
+
+-- LSP Zone
+local lspconfig_defaults = require('lspconfig').util.default_config
+lspconfig_defaults.capabilities = vim.tbl_deep_extend(
+	'force',
+	lspconfig_defaults.capabilities,
+	require('cmp_nvim_lsp').default_capabilities()
+)
+
+vim.api.nvim_create_autocmd('LspAttach', {
+	desc = 'LSP actions',
+	callback = function(event)
+		local opts = {buffer = event.buf}
+
+		vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
+		vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
+		vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
+		vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
+		vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
+		vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
+		vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
+		vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
+		vim.keymap.set({'n', 'x'}, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
+		vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
+	end,
+})
+
+require('mason').setup({})
+require('mason-lspconfig').setup({
+	handlers = {
+		function(server_name)
+			require('lspconfig')[server_name].setup({})
+		end,
+	},
+})
+
+local cmp = require('cmp')
+
+cmp.setup({
+	sources = {
+		{name = 'nvim_lsp'},
+	},
+	mapping = cmp.mapping.preset.insert({
+		['<C-p>'] = cmp.mapping.select_prev_item({behavior = 'select'}),
+		['<C-n>'] = cmp.mapping.select_next_item({behavior = 'select'}),
+
+		['<C-y>'] = cmp.mapping.confirm({select = false}),
+
+		['<C-Space>'] = cmp.mapping.complete(),
+
+		['<C-u>'] = cmp.mapping.scroll_docs(-4),
+		['<C-d>'] = cmp.mapping.scroll_docs(4),
+	}),
+	snippet = {
+		expand = function(args)
+			vim.snippet.expand(args.body)
+		end,
+	},
+})
