@@ -58,6 +58,14 @@ vim.o.shiftwidth = 4
 vim.o.cursorlineopt = 'number'
 vim.o.colorcolumn = '80'
 
+vim.api.nvim_create_autocmd('TextYankPost', {
+  desc = 'Highlight when yanking (copying) text',
+  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  callback = function()
+    vim.hl.on_yank()
+  end,
+})
+
 require("lazy").setup({
 	spec = {
 
@@ -192,18 +200,19 @@ vim.cmd[[colorscheme tokyonight-night]]
 
 vim.keymap.set('n', '<leader>x', '<cmd>Explore<CR>')
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-vim.keymap.set('n', '<leader>d', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<leader>d', vim.diagnostic.setloclist)
 
 local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Telescope find files' })
-vim.keymap.set('n', '<leader>lg', builtin.live_grep, { desc = 'Telescope live grep' })
+vim.keymap.set('n', '<leader>ff', builtin.find_files)
+vim.keymap.set('n', '<leader>lg', builtin.live_grep)
 
+local ui = require('harpoon.ui')
 vim.keymap.set('n', '<leader>a', function() require("harpoon.mark").add_file() end)
-vim.keymap.set('n', '<leader>h', function() require("harpoon.ui").toggle_quick_menu() end)
-vim.keymap.set('n', '<leader>1', function() require("harpoon.ui").nav_file(1) end)
-vim.keymap.set('n', '<leader>2', function() require("harpoon.ui").nav_file(2) end)
-vim.keymap.set('n', '<leader>3', function() require("harpoon.ui").nav_file(3) end)
-vim.keymap.set('n', '<leader>4', function() require("harpoon.ui").nav_file(4) end)
+vim.keymap.set('n', '<leader>h', function() ui.toggle_quick_menu() end)
+vim.keymap.set('n', '<leader>1', function() ui.nav_file(1) end)
+vim.keymap.set('n', '<leader>2', function() ui.nav_file(2) end)
+vim.keymap.set('n', '<leader>3', function() ui.nav_file(3) end)
+vim.keymap.set('n', '<leader>4', function() ui.nav_file(4) end)
 
 -- LSP Zone
 local lspconfig_defaults = require('lspconfig').util.default_config
@@ -212,24 +221,6 @@ lspconfig_defaults.capabilities = vim.tbl_deep_extend(
 	lspconfig_defaults.capabilities,
 	require('cmp_nvim_lsp').default_capabilities()
 )
-
-vim.api.nvim_create_autocmd('LspAttach', {
-	desc = 'LSP actions',
-	callback = function(event)
-		local opts = {buffer = event.buf}
-
-		vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
-		vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
-		vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
-		vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
-		vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
-		vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
-		vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
-		vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
-		vim.keymap.set({'n', 'x'}, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
-		vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
-	end,
-})
 
 require('mason').setup({})
 require('mason-lspconfig').setup({
@@ -251,11 +242,6 @@ cmp.setup({
 		['<C-n>'] = cmp.mapping.select_next_item({behavior = 'select'}),
 
 		['<C-y>'] = cmp.mapping.confirm({select = false}),
-
-		['<C-Space>'] = cmp.mapping.complete(),
-
-		['<C-u>'] = cmp.mapping.scroll_docs(-4),
-		['<C-d>'] = cmp.mapping.scroll_docs(4),
 	}),
 	snippet = {
 		expand = function(args)
