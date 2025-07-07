@@ -69,12 +69,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 require("lazy").setup({
 	spec = {
 
-		{
-			"folke/tokyonight.nvim",
-			lazy = false,
-			priority = 1000,
-			opts = {},
-		},
+		{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 
 		{
 			"nvim-treesitter/nvim-treesitter",
@@ -196,7 +191,7 @@ require("lazy").setup({
 	checker = { enabled = true },
 })
 
-vim.cmd[[colorscheme tokyonight-night]]
+vim.cmd.colorscheme "catppuccin-mocha"
 
 vim.keymap.set('n', '<leader>x', '<cmd>Explore<CR>')
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')

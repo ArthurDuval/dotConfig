@@ -13,8 +13,17 @@ general {
 	separator = ""
 }
 
+order += "battery all"
 order += "tztime local"
 
+battery all {
+        format = "%status %percentage"
+	integer_battery_capacity = true
+	color_bad = "#FF0000"
+	threshold_type = "percentage"
+	low_threshold = 20
+}
+
 tztime local {
-        format = "%m/%d/%Y | %I:%M %p "
+        format = "| %m/%d/%Y | %I:%M %p "
 }

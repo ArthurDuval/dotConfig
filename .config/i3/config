@@ -9,7 +9,7 @@
 #
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
-set $mod Mod1
+set $mod Mod4
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -45,7 +45,7 @@ exec --no-startup-id dex --autostart --environment i3
 # floating_modifier $mod
 
 # move tiling windows via drag & drop by left-clicking into the title bar,
-# or left-clicking anywhere knto the window while holding the floating modifier.
+# or left-clicking anywhere into the window while holding the floating modifier.
 # tiling_drag modifier titlebar
 
 # start a terminal
@@ -195,10 +195,10 @@ title_align center
 default_border none
 default_floating_border none
 
-for_window [all] fullscreen enable
-
 exec_always xset -dpms
 exec_always xset s off
-exec_always picom -b --backend xrender --vsync
-exec_always hsetroot -solid '#000000'
+
 bindsym $mod+Escape exec --no-startup-id i3lock -uec 000000
+
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +10%
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 10%-
