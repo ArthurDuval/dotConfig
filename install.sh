@@ -1,5 +1,5 @@
 #!/bin/bash
 
-sudo apt install -y iwd pulseaudio alsa-utils unzip picom hsetroot gpg treeg gcc xclip ripgrep
+sudo apt install -y iwd pulseaudio alsa-utils unzip gpg tree gcc xclip ripgrep
 
-cp .config/* ~/.config
+cp -r .config/* ~/.config
